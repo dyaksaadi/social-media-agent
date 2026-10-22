@@ -25,12 +25,34 @@ export default function CreateCampaignPage() {
   const [step, setStep] = useState(1)
   const [campaignName, setCampaignName] = useState('')
   const [selectedIcon, setSelectedIcon] = useState('🚀')
+  const [logoFile, setLogoFile] = useState<File | null>(null)
+  const [logoPreview, setLogoPreview] = useState<string>('')
   const [selectedOffice, setSelectedOffice] = useState('modern')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
   if (!user) {
     return null
+  }
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setError('Logo must be less than 5MB')
+        return
+      }
+
+      setLogoFile(file)
+      
+      // Create preview
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setLogoPreview(e.target?.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
   }
 
   const handleNext = () => {
@@ -47,6 +69,25 @@ export default function CreateCampaignPage() {
     setError('')
 
     try {
+      let logoUrl = null
+
+      // Upload logo ke storage jika ada
+      if (logoFile) {
+        const fileName = `${user.id}/${Date.now()}-${logoFile.name}`
+        const { error: uploadError, data: uploadData } = await insforge.storage
+          .from('campaign-logos')
+          .upload(fileName, logoFile)
+
+        if (uploadError) {
+          throw new Error(`Logo upload failed: ${uploadError.message}`)
+        }
+
+        // Get public URL
+        if (uploadData?.key) {
+          logoUrl = `${process.env.NEXT_PUBLIC_INSFORGE_URL}/storage/v1/object/public/campaign-logos/${uploadData.key}`
+        }
+      }
+
       const officeImage = OFFICE_IMAGES.find(o => o.id === selectedOffice)?.path
 
       const { error: campaignError } = await insforge.database
@@ -57,6 +98,7 @@ export default function CreateCampaignPage() {
             name: campaignName,
             icon: selectedIcon,
             office_image: officeImage,
+            logo: logoUrl,
           },
         ])
 
@@ -137,6 +179,63 @@ export default function CreateCampaignPage() {
                       {icon.value}
                     </button>
                   ))}
+                </div>
+              </div>
+
+              {/* Logo Upload Card */}
+              <div className="lg:col-span-2 bg-white rounded-2xl p-8 shadow-sm border border-slate-100 hover:shadow-lg transition">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                    ③
+                  </div>
+                  <h2 className="text-lg font-semibold text-slate-900">Campaign Logo</h2>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Upload Area */}
+                  <div>
+                    <label className="block mb-3">
+                      <div className="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleLogoUpload}
+                          className="hidden"
+                        />
+                        <div className="text-4xl mb-2">📸</div>
+                        <p className="text-sm font-medium text-slate-900">Click to upload logo</p>
+                        <p className="text-xs text-slate-500 mt-1">PNG, JPG up to 5MB</p>
+                      </div>
+                    </label>
+                  </div>
+
+                  {/* Preview */}
+                  <div>
+                    {logoPreview ? (
+                      <div className="bg-slate-50 rounded-xl p-6 flex flex-col items-center justify-center h-full">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={logoPreview}
+                          alt="Logo preview"
+                          className="w-24 h-24 object-contain mb-3 rounded-lg"
+                        />
+                        <p className="text-sm font-medium text-slate-900">{logoFile?.name}</p>
+                        <button
+                          onClick={() => {
+                            setLogoFile(null)
+                            setLogoPreview('')
+                          }}
+                          className="mt-3 text-xs text-red-600 hover:text-red-700 font-medium"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="bg-slate-50 rounded-xl p-6 flex items-center justify-center h-full">
+                        <p className="text-sm text-slate-500">Logo preview will appear here</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

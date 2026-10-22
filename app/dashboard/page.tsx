@@ -97,15 +97,27 @@ function DashboardContent() {
         {campaign && (
           <div className="mb-8 bg-white rounded-2xl p-8 border border-slate-100 shadow-sm hover:shadow-lg transition">
             <div className="flex items-start justify-between mb-6">
-              <div>
-                <h3 className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-2">Active Campaign</h3>
-                <div className="flex items-center gap-3">
-                  <span className="text-5xl">{campaign.icon}</span>
-                  <div>
-                    <h4 className="text-2xl font-bold text-slate-900">{campaign.name}</h4>
-                    <p className="text-slate-600 text-sm">
-                      {campaign.office_image?.includes('modern') ? 'Modern Office' : 'Wooden Office'} Environment
-                    </p>
+              <div className="flex items-center gap-6">
+                {campaign.logo && (
+                  <div className="w-24 h-24 rounded-xl bg-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={campaign.logo}
+                      alt="Campaign logo"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                <div>
+                  <h3 className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-2">Active Campaign</h3>
+                  <div className="flex items-center gap-3">
+                    <span className="text-5xl">{campaign.icon}</span>
+                    <div>
+                      <h4 className="text-2xl font-bold text-slate-900">{campaign.name}</h4>
+                      <p className="text-slate-600 text-sm">
+                        {campaign.office_image?.includes('modern') ? 'Modern Office' : 'Wooden Office'} Environment
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
