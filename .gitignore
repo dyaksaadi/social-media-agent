@@ -26,6 +26,9 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# insforge
+.insforge/project.json
+
 # vercel
 .vercel
 
