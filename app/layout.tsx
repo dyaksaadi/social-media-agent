@@ -1,9 +1,10 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import { AuthProvider } from "@/lib/auth-context";
 
 export const metadata: Metadata = {
-  title: "Next.js Premium Startup Boilerplate",
-  description: "Created using the ultimate interactive Next.js stack generator CLI.",
+  title: "Social Media AI Agent",
+  description: "Manage your social media with AI-powered assistance",
 };
 
 export default function RootLayout({
@@ -14,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body style={{ margin: 0, padding: 0 }}>
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
