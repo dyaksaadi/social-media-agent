@@ -1,0 +1,102 @@
+{
+  "schemaVersion": "1.0",
+  "type": "agentworld-scene-bundle",
+  "office": {
+    "id": "modern",
+    "name": "Modern Office",
+    "description": "Bright modern studio with skyline views and blue accents.",
+    "tone": "day",
+    "width": 1536,
+    "height": 1024,
+    "background": "/offices/modern-office.png"
+  },
+  "seats": [
+    {
+      "id": "desk-center-left",
+      "label": "Left desk",
+      "x": 247,
+      "y": 484,
+      "width": 208,
+      "zIndex": 2,
+      "character": {
+        "id": "spritesheetAgent",
+        "name": "Creator Agent",
+        "emoji": "✍️",
+        "description": "Writes and designs your posts",
+        "width": 367,
+        "height": 420,
+        "thumbnail": "/characters/agent-4/typing/frame_001.png",
+        "sprite": "/characters/agent-4/typing/frame_001.png",
+        "animations": {
+          "typing": [
+            "/characters/agent-4/typing/frame_001.png",
+            "/characters/agent-4/typing/frame_002.png",
+            "/characters/agent-4/typing/frame_003.png",
+            "/characters/agent-4/typing/frame_004.png",
+            "/characters/agent-4/typing/frame_005.png",
+            "/characters/agent-4/typing/frame_006.png"
+          ]
+        }
+      }
+    },
+    {
+      "id": "desk-center-right",
+      "label": "Right desk",
+      "x": 933,
+      "y": 396,
+      "width": 208,
+      "zIndex": 2,
+      "character": {
+        "id": "data_agent_4",
+        "name": "Research Agent",
+        "emoji": "🔍",
+        "description": "Finds trending topics and insights",
+        "width": 367,
+        "height": 420,
+        "thumbnail": "/characters/agent-4/typing/frame_001.png",
+        "sprite": "/characters/agent-4/typing/frame_001.png",
+        "animations": {
+          "typing": [
+            "/characters/agent-4/typing/frame_001.png",
+            "/characters/agent-4/typing/frame_002.png",
+            "/characters/agent-4/typing/frame_003.png",
+            "/characters/agent-4/typing/frame_004.png",
+            "/characters/agent-4/typing/frame_005.png",
+            "/characters/agent-4/typing/frame_006.png",
+            "/characters/agent-4/typing/frame_007.png",
+            "/characters/agent-4/typing/frame_008.png"
+          ]
+        }
+      }
+    },
+    {
+      "id": "seat-mvkcycnd",
+      "label": "Desk 3",
+      "x": 775,
+      "y": 627,
+      "width": 214,
+      "zIndex": 3,
+      "character": {
+        "id": "data_agent_7",
+        "name": "Scheduler Agent",
+        "emoji": "📅",
+        "description": "Plans the best time to publish",
+        "width": 401,
+        "height": 376,
+        "thumbnail": "/characters/agent-7/typing/frame_001.png",
+        "sprite": "/characters/agent-7/typing/frame_001.png",
+        "animations": {
+          "typing": [
+            "/characters/agent-7/typing/frame_001.png",
+            "/characters/agent-7/typing/frame_002.png",
+            "/characters/agent-7/typing/frame_003.png",
+            "/characters/agent-7/typing/frame_004.png",
+            "/characters/agent-7/typing/frame_005.png",
+            "/characters/agent-7/typing/frame_006.png",
+            "/characters/agent-7/typing/frame_007.png"
+          ]
+        }
+      }
+    }
+  ]
+}

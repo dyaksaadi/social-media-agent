@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import insforge from '@/lib/insforge-client'
+import AgentOffice from '@/components/dashboard/agent-office'
 import {
   CalendarDays,
   Activity,
@@ -110,6 +111,8 @@ export default function OverviewPage() {
   const progress = totalPosts > 0 ? Math.round((postedPosts / totalPosts) * 100) : 0
 
   const firstName = user?.name?.split(' ')[0] || user?.email?.split('@')[0] || ''
+
+  const officeVariant = String(campaign?.office_image || '').includes('wooden') ? 'wooden' : 'modern'
 
   if (loading) {
     return (
@@ -274,8 +277,32 @@ export default function OverviewPage() {
         </div>
       </div>
 
-      {/* ============ RIGHT HALF (blank for now) ============ */}
-      <div className="hidden lg:block"></div>
+      {/* ============ RIGHT HALF: AI AGENT OFFICE ============ */}
+      <div className="lg:sticky lg:top-6 self-start">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          {/* Card header */}
+          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-lg">
+                🏢
+              </div>
+              <div>
+                <h2 className="font-bold text-slate-900 text-sm leading-tight">AI Agent Office</h2>
+                <p className="text-[11px] text-slate-500">Your team at work, live</p>
+              </div>
+            </div>
+            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-50 border border-green-100 text-[11px] font-semibold text-green-700">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+              Live
+            </span>
+          </div>
+
+          {/* Office scene */}
+          <div className="p-3">
+            <AgentOffice office={officeVariant} />
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
