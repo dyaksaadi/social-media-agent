@@ -41,7 +41,13 @@ interface SceneBundle {
 
 const FRAME_MS = 150
 
-export default function AgentOffice({ office = 'modern' }: { office?: OfficeVariant }) {
+export interface AgentOfficeProps {
+  office?: OfficeVariant
+  selectedAgentId?: string | null
+  onAgentSelect?: (agentId: string) => void
+}
+
+export default function AgentOffice({ office = 'modern', selectedAgentId = null, onAgentSelect }: AgentOfficeProps) {
   const [scene, setScene] = useState<SceneBundle | null>(null)
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [tick, setTick] = useState(0)
@@ -158,9 +164,11 @@ export default function AgentOffice({ office = 'modern' }: { office?: OfficeVari
         const src = frames[tick % frames.length]
 
         return (
-          <div
+          <button
             key={seat.id}
-            className="group absolute"
+            type="button"
+            onClick={() => onAgentSelect?.(seat.id)}
+            className={`group absolute cursor-pointer rounded-lg transition-all outline-none focus:outline-none ${selectedAgentId === seat.id ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-white' : 'hover:ring-2 hover:ring-blue-300/70'}`}
             style={{
               left: `${(seat.x / meta.width) * 100}%`,
               top: `${(seat.y / meta.height) * 100}%`,
@@ -168,6 +176,8 @@ export default function AgentOffice({ office = 'modern' }: { office?: OfficeVari
               height: `${(ch.height / meta.height) * 100}%`,
               zIndex: (seat.zIndex || 1) + 2,
             }}
+            aria-label={`Select ${ch.name}`}
+            aria-pressed={selectedAgentId === seat.id}
           >
             {/* Popover: emoji + agent name, description appears on hover */}
             <div className="absolute bottom-full left-1/2 z-20 mb-1 flex -translate-x-1/2 flex-col items-center">
@@ -202,7 +212,7 @@ export default function AgentOffice({ office = 'modern' }: { office?: OfficeVari
                 }
               }}
             />
-          </div>
+          </button>
         )
       })}
     </div>
