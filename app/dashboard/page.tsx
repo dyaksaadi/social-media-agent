@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import insforge from '@/lib/insforge-client'
 import AgentOffice from '@/components/dashboard/agent-office'
+import AgentPanel, { type Agent } from '@/components/dashboard/agent-panel'
 import {
   CalendarDays,
   Activity,
@@ -61,6 +62,9 @@ export default function OverviewPage() {
   const [campaign, setCampaign] = useState<any>(null)
   const [messages, setMessages] = useState<MessageRow[]>([])
   const [loading, setLoading] = useState(true)
+  const [officeVariant, setOfficeVariant] = useState<'modern' | 'wooden'>('modern')
+  const [agents, setAgents] = useState<Agent[]>([])
+  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -74,6 +78,7 @@ export default function OverviewPage() {
           .single()
 
         setCampaign(campaignData)
+        setOfficeVariant(String(campaignData?.office_image || '').includes('wooden') ? 'wooden' : 'modern')
 
         if (campaignData) {
           const { data: messagesData } = await insforge.database
@@ -96,6 +101,29 @@ export default function OverviewPage() {
     }
   }, [user])
 
+  useEffect(() => {
+    let cancelled = false
+    fetch(`/office-studio/${officeVariant}-office.json`)
+      .then((r) => r.json())
+      .then((data: any) => {
+        if (cancelled) return
+        const list: Agent[] = (data?.seats || [])
+          .filter((s: any) => s?.character)
+          .map((s: any) => ({
+            id: s.id,
+            name: s.character.name,
+            emoji: s.character.emoji,
+            description: s.character.description,
+            thumbnail: s.character.thumbnail,
+          }))
+        setAgents(list)
+      })
+      .catch((err) => console.error('Failed to load agents:', err))
+    return () => {
+      cancelled = true
+    }
+  }, [officeVariant])
+
   // Derived data
   const scheduledPosts = messages
     .filter((m) => m.status === 'scheduled' && m.scheduled_at)
@@ -112,7 +140,7 @@ export default function OverviewPage() {
 
   const firstName = user?.name?.split(' ')[0] || user?.email?.split('@')[0] || ''
 
-  const officeVariant = String(campaign?.office_image || '').includes('wooden') ? 'wooden' : 'modern'
+  const selectedAgent = agents.find((a) => a.id === selectedAgentId) || null
 
   if (loading) {
     return (
@@ -126,7 +154,18 @@ export default function OverviewPage() {
     <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
       {/* ============ LEFT HALF ============ */}
       <div className="space-y-6">
-        {/* Greeting + Headline */}
+        {selectedAgent ? (
+          <div className="space-y-4">
+            <button
+              onClick={() => setSelectedAgentId(null)}
+              className="flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 transition"
+            >
+              ← Back to overview
+            </button>
+            <AgentPanel agent={selectedAgent} />
+          </div>
+        ) : (
+          <>
         <div>
           <p className="text-orange-500 text-sm font-semibold mb-2">
             {getGreeting()}, {firstName} 👋
@@ -275,8 +314,9 @@ export default function OverviewPage() {
             </div>
           )}
         </div>
+          </>
+        )}
       </div>
-
       {/* ============ RIGHT HALF: AI AGENT OFFICE ============ */}
       <div className="lg:sticky lg:top-6 self-start">
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
@@ -299,7 +339,7 @@ export default function OverviewPage() {
 
           {/* Office scene */}
           <div className="p-3">
-            <AgentOffice office={officeVariant} />
+            <AgentOffice office={officeVariant} selectedAgentId={selectedAgentId} onAgentSelect={setSelectedAgentId} />
           </div>
         </div>
       </div>
