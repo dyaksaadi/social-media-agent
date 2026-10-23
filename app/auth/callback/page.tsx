@@ -1,10 +1,21 @@
 'use client'
 
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import insforge from '@/lib/insforge-client'
 
-export default function AuthCallbackPage() {
+function LoadingScreen() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <p className="mt-4 text-slate-600">Authenticating...</p>
+      </div>
+    </div>
+  )
+}
+
+function CallbackContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -16,7 +27,7 @@ export default function AuthCallbackPage() {
 
         // Get current user (session should be set by SDK)
         const { data: userData, error: userError } = await insforge.auth.getCurrentUser()
-        
+
         console.log('Get current user result:', { userData, userError })
 
         if (userError || !userData?.user) {
@@ -47,7 +58,7 @@ export default function AuthCallbackPage() {
                 email: user.email || '',
               },
             ])
-            
+
             if (insertError) {
               console.error('Insert error:', insertError)
             } else {
@@ -72,12 +83,13 @@ export default function AuthCallbackPage() {
     handleCallback()
   }, [router, searchParams])
 
+  return <LoadingScreen />
+}
+
+export default function AuthCallbackPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        <p className="mt-4 text-slate-600">Authenticating...</p>
-      </div>
-    </div>
+    <Suspense fallback={<LoadingScreen />}>
+      <CallbackContent />
+    </Suspense>
   )
 }
