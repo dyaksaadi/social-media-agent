@@ -102,16 +102,27 @@ export default function CreateMessagePage() {
   const charCount = content.length
   const charWarning = charCount > charLimit * 0.8
 
-  const generateAiSuggestion = () => {
-    // Placeholder AI suggestion - in production, call OpenRouter AI
-    const suggestions = [
-      `🚀 Check this out! ${campaign?.name} is here to transform your social media. Don't miss out! #AI #Social`,
-      `✨ Introducing ${campaign?.name} - Your new favorite social media companion. Join thousands of happy users! 🎯`,
-      `💡 Ready to level up? ${campaign?.name} makes creating content easier than ever. Try it free today! 🔥`,
-    ]
-    const random = suggestions[Math.floor(Math.random() * suggestions.length)]
-    setAiSuggestion(random)
-    setShowAiSuggestion(true)
+  const generateAiSuggestion = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: 'Write a short, engaging social media post for the campaign "' + (campaign?.name || '') + '". Include relevant emojis and hashtags.',
+        }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data?.error || 'AI suggestion failed')
+      setAiSuggestion(data.content || '')
+      setShowAiSuggestion(true)
+    } catch (err) {
+      console.error('AI suggestion error:', err)
+      setAiSuggestion('Check out ' + (campaign?.name || 'our campaign') + '! Don\'t miss out. #AI #Social')
+      setShowAiSuggestion(true)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const applyAiSuggestion = () => {
