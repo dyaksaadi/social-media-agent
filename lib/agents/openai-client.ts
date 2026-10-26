@@ -38,7 +38,7 @@ export function getOpenAIClient(): OpenAI {
   client = new OpenAI({
     apiKey,
     // Optional: point at a compatible gateway/proxy (e.g. for self-hosted routers).
-    baseURL: process.env.OPENCODE_API_URL || process.env.OPENAI_BASE_URL || 'https://opencode.ai/inference/openai/v1',
+    baseURL: process.env.OPENAI_BASE_URL || process.env.OPENCODE_API_URL || 'https://api.groq.com/openai/v1',
   })
 
   // Let the Agents SDK resolve string model names (e.g. "gpt-6-astra")
@@ -50,5 +50,5 @@ export function getOpenAIClient(): OpenAI {
 
 /** Model used by the agents. Override with OPENAI_MODEL without code changes. */
 export function getAgentModelName(): string {
-  return process.env.OPENCODE_MODEL || process.env.OPENAI_MODEL || 'glm-5.3'
+  return process.env.OPENAI_MODEL || process.env.OPENCODE_MODEL || 'openai/gpt-oss-20b'
 }
