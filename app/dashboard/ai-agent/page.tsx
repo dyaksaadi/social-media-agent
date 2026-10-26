@@ -6,6 +6,7 @@ import insforge from '@/lib/insforge-client'
 import AgentOffice from '@/components/dashboard/agent-office'
 import type { OfficeVariant } from '@/components/dashboard/agent-office'
 import AgentPanel, { type Agent } from '@/components/dashboard/agent-panel'
+import { AGENT_REGISTRY, resolveAgentRole } from '@/lib/agents/registry'
 import { Sparkles, Bot } from 'lucide-react'
 
 export default function AiAgentPage() {
@@ -41,15 +42,31 @@ export default function AiAgentPage() {
       .then((r) => r.json())
       .then((data: any) => {
         if (cancelled) return
-        const list: Agent[] = (data?.seats || [])
+        const seated: Agent[] = (data?.seats || [])
           .filter((s: any) => s?.character)
           .map((s: any) => ({
             id: s.id,
+            // Map the scene character to a canonical backend agent role.
+            role: resolveAgentRole({ characterId: s.character.id, name: s.character.name }) ?? 'content',
             name: s.character.name,
             emoji: s.character.emoji,
             description: s.character.description,
             thumbnail: s.character.thumbnail,
           }))
+
+        // The Analytics agent has no seat in the office scene — append it so
+        // all four backend agents are reachable from the Chat UI.
+        const analytics = AGENT_REGISTRY.analytics
+        const list: Agent[] = [
+          ...seated,
+          {
+            id: 'agent-analytics',
+            role: 'analytics',
+            name: analytics.name,
+            emoji: analytics.emoji,
+            description: analytics.description,
+          },
+        ]
         setAgents(list)
         if (list.length > 0) setSelectedAgentId((prev) => prev || list[0].id)
       })
@@ -66,7 +83,7 @@ export default function AiAgentPage() {
     setSelectedAgentId(id)
   }
 
-  const AGENT_COLORS = ['bg-purple-100 text-purple-600', 'bg-blue-100 text-blue-600', 'bg-emerald-100 text-emerald-600']
+  const AGENT_COLORS = ['bg-purple-100 text-purple-600', 'bg-blue-100 text-blue-600', 'bg-emerald-100 text-emerald-600', 'bg-amber-100 text-amber-600']
 
   if (loading) {
     return (

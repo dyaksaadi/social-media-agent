@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context'
 import insforge from '@/lib/insforge-client'
 import AgentOffice from '@/components/dashboard/agent-office'
 import AgentPanel, { type Agent } from '@/components/dashboard/agent-panel'
+import { resolveAgentRole } from '@/lib/agents/registry'
 import {
   CalendarDays,
   Activity,
@@ -111,6 +112,9 @@ export default function OverviewPage() {
           .filter((s: any) => s?.character)
           .map((s: any) => ({
             id: s.id,
+            // Map the scene character to a canonical backend agent role so the
+            // chat panel talks to the right OpenAI agent.
+            role: resolveAgentRole({ characterId: s.character.id, name: s.character.name }) ?? 'content',
             name: s.character.name,
             emoji: s.character.emoji,
             description: s.character.description,
